@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рулетка Фортуны</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1d2d;
+            --wheel-bg: #2c3049;
+            --controls-bg: #23263a;
+            --text-color: #e0e1eb;
+            --accent-color: #00aaff;
+            --glow-color: rgba(0, 170, 255, 0.7);
+            --incognito-color: #1f2233;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            align-items: center;
+        }
+
+        /* --- Секция с рулеткой --- */
+        .wheel-section {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .wheel-wrapper.shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97);
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .wheel, .wheel-labels {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0; left: 0;
+            will-change: transform;
+        }
+
+        .wheel {
+            overflow: hidden;
+            border: 8px solid var(--wheel-bg);
+            box-shadow: 0 0 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        .wheel-wrapper.idle .wheel,
+        .wheel-wrapper.idle .wheel-labels {
+            animation: idle-rotation 40s linear infinite;
+        }
+        @keyframes idle-rotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .wheel-labels {
+            pointer-events: none; z-index: 4;
+            opacity: 1; transition: opacity 0.3s ease;
+        }
+        .wheel-labels.hidden { opacity: 0; }
+        .wheel-labels span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700;color:white;text-shadow:1px 1px 4px rgba(0,0,0,.8);white-space:nowrap;text-align:center}
+
+        .reveal-overlay {
+            position: absolute;
+            width: calc(100% - 16px);
+            height: calc(100% - 16px);
+            background: var(--incognito-color);
+            border-radius: 50%; z-index: 3;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease 1s, background-color 0.4s ease;
+        }
+        .reveal-overlay.visible { opacity: 1; }
+
+        .pointer{position:absolute;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:40px solid var(--accent-color);top:-10px;z-index:10;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5));transform-origin:bottom center}.pointer.settle{animation:pointer-settle .8s cubic-bezier(.2,1.5,.5,1)}@keyframes pointer-settle{0%{transform:rotate(0deg)}20%{transform:rotate(15deg)}40%{transform:rotate(-10deg)}60%{transform:rotate(5deg)}80%{transform:rotate(-2deg)}100%{transform:rotate(0deg)}}
+
+        #spin-btn{position:absolute;width:120px;height:120px;border-radius:50%;background:var(--wheel-bg);border:5px solid #3c4161;color:var(--text-color);cursor:pointer;z-index:5;box-shadow:0 10px 0 #1e2133,0 15px 20px rgba(0,0,0,.4), 0 0 0px var(--accent-color);transition:transform .1s ease,box-shadow .3s ease;display:flex;justify-content:center;align-items:center;overflow:hidden}
+        #spin-btn:hover {
+            box-shadow: 0 10px 0 #1e2133, 0 15px 20px rgba(0,0,0,0.4), 0 0 25px var(--accent-color);
+        }
+        #spin-btn:active,#spin-btn.charging{transform:translateY(5px) scale(.95);box-shadow:0 5px 0 #1e2133,0 8px 10px rgba(0,0,0,.4), 0 0 25px var(--accent-color)}#spin-btn .spin-btn-text{font-size:24px;font-weight:700;z-index:2}.charge-indicator{position:absolute;bottom:0;left:0;width:100%;height:0%;background:var(--accent-color);opacity:.5;transition:height .1s linear;z-index:1}
+
+        .controls-section{
+            width: 350px; flex-shrink: 0;
+            height: 100%; background: var(--controls-bg);
+            padding: 30px; display: flex;
+            flex-direction: column; box-shadow: -10px 0 25px rgba(0,0,0,0.4);
+            transition: width 0.5s ease, padding 0.5s ease;
+            overflow: hidden;
+        }
+        .controls-section.closed{
+            width: 0;
+            padding-left: 0; padding-right: 0;
+        }
+        
+        .close-controls-btn{position:absolute;top:15px;right:20px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;opacity:.5; z-index: 10;}.open-controls-btn{position:fixed;top:20px;right:20px;width:50px;height:50px;border-radius:50%;border:none;background:var(--controls-bg);font-size:24px;cursor:pointer;z-index:101}.open-controls-btn.hidden{opacity:0;visibility:hidden}#prize-input{width:100%;flex-grow:1;background:var(--bg-color);border:2px solid var(--wheel-bg);border-radius:8px;color:var(--text-color);padding:15px;font-size:16px;resize:none;margin-top:20px}#update-btn{padding:15px;border-radius:8px;background:var(--accent-color);color:#fff;font-size:18px;font-weight:600;cursor:pointer;border:none;margin-top:20px}
+        
+        .modal{display:flex;position:fixed;z-index:100;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);backdrop-filter:blur(5px);justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:opacity .4s ease,visibility .4s ease}.modal.visible{opacity:1;visibility:visible}.modal-content{background:var(--controls-bg);padding:40px 60px;border-radius:15px;text-align:center;position:relative;border:2px solid var(--accent-color);transform:translateY(50px);opacity:0;transition:transform .5s cubic-bezier(.2,1.5,.5,1),opacity .5s ease}.modal.visible .modal-content{transform:translateY(0);opacity:1;animation:prize-glow 1.5s infinite alternate}@keyframes prize-glow{from{box-shadow:0 0 20px var(--glow-color)}to{box-shadow:0 0 40px var(--glow-color),0 0 10px var(--glow-color)}}#prize-text{font-size:2.2em;font-weight:700}
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="wheel-section">
+            <div class="wheel-wrapper" id="wheel-wrapper">
+                <div class="wheel" id="wheel"></div>
+                <div class="wheel-labels" id="wheel-labels"></div>
+                <div class="reveal-overlay" id="reveal-overlay"></div>
+                <div class="pointer" id="pointer"></div>
+                <button id="spin-btn">
+                    <span class="spin-btn-text">Крутить</span>
+                    <div class="charge-indicator" id="charge-indicator"></div>
+                </button>
+            </div>
+        </div>
+        <div class="controls-section" id="controls-section">
+            <button class="close-controls-btn" id="close-controls-btn">&times;</button>
+            <h2>Варианты для рулетки</h2>
+            <p>Введите каждый приз с новой строки</p>
+            <textarea id="prize-input" rows="10">Джекпот!
+Еще попытка</textarea>
+            <button id="update-btn">Обновить рулетку</button>
+        </div>
+    </div>
+    <button class="open-controls-btn hidden" id="open-controls-btn">⚙️</button>
+    <div id="prize-modal" class="modal"><div class="modal-content"><p id="prize-text"></p></div></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wheel = document.getElementById('wheel');
+            const wheelWrapper = document.getElementById('wheel-wrapper');
+            const wheelLabels = document.getElementById('wheel-labels');
+            const pointer = document.getElementById('pointer');
+            const spinBtn = document.getElementById('spin-btn');
+            const chargeIndicator = document.getElementById('charge-indicator');
+            const revealOverlay = document.getElementById('reveal-overlay');
+            const prizeInput = document.getElementById('prize-input');
+            const updateBtn = document.getElementById('update-btn');
+            const prizeModal = document.getElementById("prize-modal");
+            const prizeText = document.getElementById("prize-text");
+            const controlsSection = document.getElementById('controls-section');
+            const closeControlsBtn = document.getElementById('close-controls-btn');
+            const openControlsBtn = document.getElementById('open-controls-btn');
+
+            let prizes = [];
+            let currentRotation = 0;
+            let isSpinning = false;
+            let isCharging = false;
+            let modalTimeout;
+            const colorPalette = ["#ff6b6b","#f06595","#cc5de8","#845ef7","#5c7cfa","#339af0","#22b8cf","#20c997","#51cf66","#94d82d","#fcc419","#ff922b"];
+
+            let power = 0;
+            let chargeInterval;
+
+            const startCharge = () => {
+                if (isSpinning || isCharging) return;
+                isCharging = true;
+                
+                const transformMatrix = window.getComputedStyle(wheel).getPropertyValue('transform');
+                if (transformMatrix !== 'none') {
+                    const values = transformMatrix.split('(')[1].split(')')[0].split(',');
+                    currentRotation = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
+                }
+                
+                wheelWrapper.classList.remove('idle');
+                wheel.style.animation = 'none'; // Мгновенно останавливаем CSS анимацию
+                wheelLabels.style.animation = 'none';
+                
+                // Применяем текущую позицию как статичное свойство
+                wheel.style.transform = `rotate(${currentRotation}deg)`;
+                wheelLabels.style.transform = `rotate(${currentRotation}deg)`;
+
+                spinBtn.classList.add('charging');
+                power = 0;
+                chargeIndicator.style.height = '0%';
+                chargeInterval = setInterval(() => {
+                    if (power < 100) { power += 2; chargeIndicator.style.height = `${power}%`; }
+                }, 20);
+            };
+
+            const releaseCharge = () => {
+                if (!isCharging) return;
+                isCharging = false;
+                clearInterval(chargeInterval);
+                spinBtn.classList.remove('charging');
+
+                // Если просто кликнули, а не держали
+                if (power === 0) power = 5; // Минимальная сила для клика
+
+                if (isSpinning) return;
+
+                if (power > 50) {
+                    wheelWrapper.classList.add('shake');
+                    setTimeout(() => wheelWrapper.classList.remove('shake'), 500);
+                }
+                
+                revealOverlay.classList.add('visible');
+                wheelLabels.classList.add('hidden');
+                
+                spinWheel(power);
+                power = 0;
+                setTimeout(() => chargeIndicator.style.height = '0%', 200);
+            };
+
+            spinBtn.addEventListener('mousedown', startCharge);
+            spinBtn.addEventListener('mouseup', releaseCharge);
+            spinBtn.addEventListener('mouseleave', releaseCharge);
+            spinBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startCharge(); });
+            spinBtn.addEventListener('touchend', (e) => { e.preventDefault(); releaseCharge(); });
+
+            function updateWheel() {
+                const prizeNames=prizeInput.value.split('\n').filter(name=>name.trim()!=='');if(prizeNames.length===0)return;prizes=prizes.map((name,index)=>({text:name.trim(),color:colorPalette[index%colorPalette.length]}));const numSectors=prizes.length;const sectorAngle=360/numSectors;const baseFontSize=40;const minFontSize=14;const dynamicFontSize=Math.max(minFontSize,baseFontSize/Math.sqrt(numSectors));let gradientString='conic-gradient(';prizes.forEach((p,i)=>gradientString+=`${p.color} ${i*sectorAngle}deg ${(i+1)*sectorAngle}deg, `);wheel.style.background=gradientString.slice(0,-2)+')';wheelLabels.innerHTML='';prizes.forEach((prize,index)=>{const label=document.createElement('span');label.textContent=prize.text;label.style.fontSize=`${dynamicFontSize}px`;const labelAngleRad=((index*sectorAngle)+(sectorAngle/2)-90)*(Math.PI/180);const textRadius=wheel.offsetWidth/2*.65;const x=textRadius*Math.cos(labelAngleRad);const y=textRadius*Math.sin(labelAngleRad);const textRotation=(index*sectorAngle)+(sectorAngle/2);label.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px) rotate(${textRotation}deg)`;wheelLabels.appendChild(label)});resetWheelState()
+            }
+
+            function spinWheel(launchPower) {
+                isSpinning = true;
+                
+                const numSectors = prizes.length;
+                const randomPrizeIndex = Math.floor(Math.random() * numSectors);
+                const prize = prizes[randomPrizeIndex];
+                const targetAngle = (360 - (randomPrizeIndex * (360/numSectors))) - ((360/numSectors)/2);
+                
+                const baseRotations=5;const powerRotations=Math.floor(launchPower/20);
+                const totalRotations = (baseRotations + powerRotations) * 360;
+                
+                currentRotation += totalRotations + targetAngle - (currentRotation % 360);
+                
+                const spinDuration = 5+(launchPower/100)*4;
+                const transitionStyle = `transform ${spinDuration}s cubic-bezier(0.2,0.8,0.2,1)`;
+                
+                wheel.style.transition = transitionStyle;
+                wheelLabels.style.transition = transitionStyle;
+                wheel.style.transform = `rotate(${currentRotation}deg)`;
+                wheelLabels.style.transform = `rotate(${currentRotation}deg)`;
+
+                wheel.addEventListener('transitionend', () => revealPrize(prize), { once: true });
+            }
+
+            function revealPrize(prize) {
+                pointer.classList.add('settle');
+                revealOverlay.style.backgroundColor = prize.color;
+                setTimeout(() => showPrizeModal(prize.text), 500);
+            }
+            
+            function showPrizeModal(text) {
+                clearTimeout(modalTimeout);
+                prizeText.textContent = text;
+                prizeModal.classList.add('visible');
+                modalTimeout = setTimeout(() => {
+                    prizeModal.classList.remove('visible');
+                    resetWheelState();
+                }, 3000);
+            }
+
+            function resetWheelState() {
+                isSpinning = false; // Разблокируем кнопку только здесь
+                revealOverlay.classList.remove('visible');
+                
+                setTimeout(() => {
+                    revealOverlay.style.backgroundColor = 'var(--incognito-color)';
+                    wheelLabels.classList.remove('hidden');
+                }, 500);
+
+                const finalAngle = currentRotation % 360;
+                wheel.style.transition = 'none';
+                wheelLabels.style.transition = 'none';
+                wheel.style.transform = `rotate(${finalAngle}deg)`;
+                wheelLabels.style.transform = `rotate(${finalAngle}deg)`;
+                currentRotation = finalAngle;
+
+                setTimeout(() => {
+                     wheel.style.animation = '';
+                     wheelLabels.style.animation = '';
+                     wheelWrapper.classList.add('idle');
+                }, 100);
+            }
+            
+            pointer.addEventListener('animationend', () => pointer.classList.remove('settle'));
+            updateBtn.addEventListener('click',updateWheel);
+            closeControlsBtn.addEventListener('click',()=>{
+                controlsSection.classList.add('closed');
+                openControlsBtn.classList.remove('hidden');
+            });
+            openControlsBtn.addEventListener('click',()=>{
+                controlsSection.classList.remove('closed');
+                openControlsBtn.classList.add('hidden');
+            });
+
+            updateWheel();
+        });
+    </script>
+</body>
+</html>
