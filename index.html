@@ -3,80 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UIUXer Portfolio</title>
+    <title>UIUXer | Premium Creative Portfolio</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
     <style>
-        :root { --bg: #0F0F10; --text: #FFFFFF; --accent: #FF7A50; --secondary: #7B92FF; --card: #1C1C1E; --border: rgba(255,255,255,0.08); }
-        [data-theme="light"] { --bg: #F9F9FB; --text: #1D1D1F; --card: #FFFFFF; --border: rgba(0,0,0,0.05); }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); transition: 0.3s; overflow-x: hidden; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 8%; position: sticky; top: 0; background: var(--bg); z-index: 1000; border-bottom: 1px solid var(--border); }
-        .nav-links { display: flex; gap: 30px; list-style: none; }
-        .nav-links a { text-decoration: none; color: inherit; font-weight: 600; transition: 0.3s; }
-        .nav-links a:hover { color: var(--accent); }
-        .burger { display: none; cursor: pointer; font-size: 24px; }
-        .hero { padding: 100px 8%; text-align: center; }
-        .hero h1 { font-size: clamp(2rem, 5vw, 4rem); margin: 20px 0; }
-        .hero span { color: var(--accent); }
-        .btn { padding: 15px 30px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-block; transition: 0.2s; box-shadow: 0 4px 0px #D45A33; transform: translateY(-3px); }
-        .btn-orange { background: var(--accent); color: #fff; }
-        .btn:active { transform: translateY(0); box-shadow: none; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 50px 8%; }
-        .card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); }
-        .card img { width: 100%; border-radius: 15px; }
-        #register { padding: 60px 8%; max-width: 450px; margin: 0 auto; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
-        #map { height: 250px; border-radius: 20px; margin: 40px 8%; border: 1px solid var(--border); }
-        @media (max-width: 768px) { .nav-links { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background: var(--card); padding: 20px; } .nav-links.active { display: flex; } .burger { display: block; } }
+        :root {
+            --bg: #0F0F10; --text: #FFFFFF; --accent: #FF7A50; --secondary: #7B92FF;
+            --card: #1C1C1E; --border: rgba(255, 255, 255, 0.08); --btn-shadow: #D45A33;
+            --loader-bg: #0F0F10;
+        }
+        [data-theme="light"] {
+            --bg: #F9F9FB; --text: #1D1D1F; --card: #FFFFFF; --border: rgba(0, 0, 0, 0.05);
+            --btn-shadow: #D1D1D1; --loader-bg: #FFFFFF;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; border: 2px solid var(--bg); }
+
+        body { 
+            margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); 
+            color: var(--text); transition: background 0.5s ease; overflow-x: hidden; scroll-behavior: smooth;
+        }
+
+        /* 1s Smooth Preloader */
+        #preloader {
+            position: fixed; inset: 0; background: var(--loader-bg); z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), visibility 1s;
+        }
+        .loader-text { font-size: 2rem; font-weight: 800; letter-spacing: 10px; color: var(--accent); animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.3; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* Convex 3D Buttons */
+        .btn-3d {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 18px 36px; border-radius: 16px; border: none; font-weight: 800;
+            cursor: pointer; transition: 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none; position: relative;
+            box-shadow: 0 6px 0 var(--btn-shadow); transform: translateY(-4px);
+        }
+        .btn-orange { background: var(--accent); color: white; --btn-shadow: #D45A33; }
+        .btn-blue { background: var(--secondary); color: white; --btn-shadow: #5D71C9; }
+        .btn-3d:active { transform: translateY(-1px); box-shadow: 0 2px 0 var(--btn-shadow); }
+
+        /* Navigation */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 8%; position: sticky; top: 0; background: rgba(15, 15, 16, 0.8);
+            backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid var(--border);
+        }
+        .logo { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+        .nav-links { display: flex; gap: 40px; list-style: none; }
+        .nav-links a { text-decoration: none; color: inherit; font-weight: 600; font-size: 15px; opacity: 0.7; transition: 0.3s; }
+        .nav-links a:hover { opacity: 1; color: var(--accent); }
+
+        /* Hero & Крутилка */
+        .hero { padding: 120px 8% 80px; text-align: center; position: relative; }
+        .hero h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); line-height: 1.1; font-weight: 800; margin: 25px 0; }
+        .hero h1 span { background: linear-gradient(90deg, var(--accent), #FFB08E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .rotating-badge {
+            width: 160px; height: 160px; margin: 40px auto; position: relative;
+            animation: rotateText 15s linear infinite;
+        }
+        @keyframes rotateText { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Stats Section */
+        .stats { display: flex; justify-content: center; gap: 80px; padding: 60px 8%; border-top: 1px solid var(--border); }
+        .stat-box h2 { font-size: 48px; margin: 0; color: var(--accent); }
+        .stat-box p { margin: 5px 0 0; opacity: 0.5; font-weight: 600; text-transform: uppercase; font-size: 12px; }
+
+        /* Grid System */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 40px; padding: 80px 8%; }
+        .card { 
+            background: var(--card); border-radius: 40px; padding: 40px; border: 1px solid var(--border);
+            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1); position: relative; overflow: hidden;
+        }
+        .card:hover { transform: translateY(-15px); border-color: var(--accent); box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
+        .card img { width: 100%; border-radius: 25px; margin-bottom: 30px; transition: 0.5s; }
+        .card:hover img { transform: scale(1.03); }
+
+        /* Registration Form */
+        .reg-container { padding: 100px 8%; display: flex; justify-content: center; }
+        .reg-card { 
+            background: var(--card); padding: 50px; border-radius: 40px; border: 1px solid var(--border);
+            width: 100%; max-width: 500px; text-align: center;
+        }
+        .reg-card input {
+            width: 100%; padding: 18px; margin-bottom: 20px; border-radius: 15px;
+            border: 1px solid var(--border); background: var(--bg); color: white; font-size: 16px; outline: none;
+            transition: 0.3s;
+        }
+        .reg-card input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(255,122,80,0.2); }
+
+        /* Footer & Map */
+        footer { background: var(--card); padding: 100px 8% 40px; border-top: 1px solid var(--border); }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.5fr; gap: 60px; }
+        .footer-col h4 { color: var(--accent); margin-bottom: 25px; font-size: 18px; }
+        .footer-col a { display: block; color: var(--text); opacity: 0.6; text-decoration: none; margin-bottom: 12px; transition: 0.3s; }
+        .footer-col a:hover { opacity: 1; padding-left: 5px; color: var(--accent); }
+        #map { height: 200px; border-radius: 25px; margin-top: 20px; border: 1px solid var(--border); filter: grayscale(1) invert(1); }
+
+        @media (max-width: 992px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .stats { gap: 30px; flex-wrap: wrap; }
+            .nav-links { display: none; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div style="font-weight:800; font-size:24px;">UIUXer</div>
-        <ul class="nav-links" id="navMenu">
-            <li><a href="#">Home</a></li>
-            <li><a href="#work">Work</a></li>
-            <li><a href="#register">Register</a></li>
-            <li><button onclick="toggleTheme()" style="background:none; border:none; cursor:pointer; font-size:20px;">🌓</button></li>
-        </ul>
-        <div class="burger" onclick="toggleMenu()">☰</div>
-    </header>
 
-    <section class="hero" data-aos="fade-up">
-        <h1>Tell your creativity to the <br><span>world with UIUXer</span></h1>
-        <p>A creative, minimal, and cleanly designed portfolio template.</p>
-        <a href="#register" class="btn btn-orange">Get Started Now</a>
-    </section>
-
-    <div id="work" class="grid">
-        <div class="card" data-aos="zoom-in">
-            <img src="https://via.placeholder.com/400x250/1c1c1e/ffffff?text=UX+Project" alt="Work">
-            <h3>App Re-Design</h3>
-            <button class="btn btn-orange" style="margin-top:15px; padding:10px 20px;">View Project</button>
-        </div>
-        <div class="card" data-aos="zoom-in" data-aos-delay="200">
-            <img src="https://via.placeholder.com/400x250/1c1c1e/ffffff?text=UI+Project" alt="Work">
-            <h3>SaaS Website</h3>
-            <button class="btn btn-orange" style="margin-top:15px; padding:10px 20px;">View Project</button>
-        </div>
+    <div id="preloader">
+        <div class="loader-text">UIUXER</div>
     </div>
 
-    <section id="register" data-aos="fade-right">
-        <h2>Join UIUXer</h2>
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="email" id="regEmail" placeholder="Email Address">
-        <button class="btn btn-orange" style="width:100%; margin-top:10px;" onclick="registerUser()">Sign Up</button>
-        <p id="status"></p>
+    <header>
+        <div class="logo">UIUX<span>er</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#work">Projects</a></li>
+            <li><a href="#register">Registration</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <button onclick="toggleTheme()" style="background:none; border:none; cursor:pointer; font-size:22px;">🌓</button>
+            <a href="#register" class="btn-3d btn-blue" style="padding: 10px 20px; font-size: 12px;">Get Started</a>
+        </div>
+    </header>
+
+    <section id="home" class="hero" data-aos="fade-up">
+        <div style="background:rgba(255,122,80,0.1); color:var(--accent); display:inline-block; padding:10px 25px; border-radius:100px; font-weight:800; font-size:12px; letter-spacing:2px;">PREMIUM TEMPLATE</div>
+        <h1>Tell your creativity to the <br><span>world with UIUXer</span></h1>
+        <p>A creative, minimal, and cleanly designed personal portfolio template for professionals.</p>
+        
+        <div style="display: flex; justify-content: center; gap: 25px; margin-top: 40px;">
+            <a href="#work" class="btn-3d btn-orange">Buy Template</a>
+            <a href="#register" class="btn-3d btn-blue">Explore More</a>
+        </div>
+
+        <div class="rotating-badge">
+            <svg viewBox="0 0 100 100">
+                <path id="circlePath" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" fill="none"/>
+                <text font-size="8.5" fill="var(--text)" font-weight="700">
+                    <textPath href="#circlePath">SEE OUR LATEST WORK • SCROLL DOWN TO • SEE OUR LATEST WORK •</textPath>
+                </text>
+            </svg>
+        </div>
     </section>
 
-    <div id="map"></div>
+    <section class="stats" data-aos="fade-up">
+        <div class="stat-box"><h2>10+</h2><p>Years Experience</p></div>
+        <div class="stat-box"><h2>500+</h2><p>Project Done</p></div>
+        <div class="stat-box"><h2>100+</h2><p>Happy Clients</p></div>
+    </section>
+
+    <section id="work" class="grid">
+        <div class="card" data-aos="fade-right">
+            <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=800" alt="Work">
+            <h3>App Re-Design Made Easy</h3>
+            <p>Attractive and stylish layouts to bring your portfolio to the next level.</p>
+            <button class="btn-3d btn-orange">Read Case Study</button>
+        </div>
+        <div class="card" data-aos="fade-left">
+            <img src="https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?auto=format&fit=crop&q=80&w=800" alt="Work">
+            <h3>SaaSup Unique Brands</h3>
+            <p>Well-planned structure to demonstrate inventiveness to your clients.</p>
+            <button class="btn-3d btn-orange">Read Case Study</button>
+        </div>
+    </section>
+
+    <section id="register" class="reg-container" data-aos="zoom-in">
+        <div class="reg-card">
+            <h2 style="font-size: 32px; margin-bottom: 10px;">Registration</h2>
+            <p style="opacity: 0.6; margin-bottom: 30px;">Join our community of creative designers.</p>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email Address">
+            <button class="btn-3d btn-blue" style="width: 100%;" onclick="handleAuth()">Sign Up Now</button>
+            <p id="authStatus" style="margin-top: 20px; font-weight: 600; color: var(--accent);"></p>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 20px;">UIUX<span>er</span></div>
+                <p style="opacity:0.6; line-height: 1.8;">The best personal portfolio template to showcase your creativity to the world.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Supportive</h4>
+                <a href="#">About Me</a><a href="#">Latest Blogs</a><a href="#">Services</a><a href="#">Contact Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>Utility</h4>
+                <a href="#">Style Guide</a><a href="#">Changelog</a><a href="#">Licenses</a><a href="#">404 Page</a>
+            </div>
+            <div class="footer-col">
+                <h4>Our Studio</h4>
+                <div id="map"></div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:80px; opacity:0.3; font-size:13px; border-top: 1px solid var(--border); padding-top: 30px;">
+            Copyright © UIUXer | Designed by VictorFlow - Powered by Firebase
+        </div>
+    </footer>
 
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBTcH3_tri2L7AHLh1e-YD-0s-QSthuE6Q",
             authDomain: "disk-c98ee.firebaseapp.com",
@@ -89,28 +233,45 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function registerUser() {
+        // Registration Logic
+        function handleAuth() {
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
-            if(name && email) {
-                db.ref('users').push({ name, email })
-                .then(() => { alert('Success!'); document.getElementById('status').innerText = "Done!"; })
-                .catch(e => alert(e.message));
+            const status = document.getElementById('authStatus');
+
+            if (name && email) {
+                db.ref('users').push({ username: name, email: email })
+                .then(() => {
+                    status.innerText = "✨ Successfully Registered!";
+                    document.getElementById('regName').value = "";
+                    document.getElementById('regEmail').value = "";
+                })
+                .catch(err => status.innerText = "❌ Error: " + err.message);
+            } else {
+                status.innerText = "⚠️ Please fill all fields!";
             }
         }
 
+        // Theme Toggle
         function toggleTheme() {
             const h = document.documentElement;
             h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
         }
 
-        function toggleMenu() {
-            document.getElementById('navMenu').classList.toggle('active');
-        }
+        // Initialize Everything
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.visibility = 'hidden', 1000);
+            }, 1000); // Ровно 1 секунда
 
-        AOS.init({ duration: 800, once: true });
-        const map = L.map('map').setView([51.505, -0.09], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            AOS.init({ duration: 1000, once: false });
+            
+            // Map
+            const map = L.map('map', { zoomControl: false }).setView([51.505, -0.09], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        });
     </script>
 </body>
 </html>
