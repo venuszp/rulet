@@ -3,95 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проект: Алые Паруса</title>
+    <title>Итоговый проект по литературе: Алые Паруса</title>
     <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --page-width: 210mm;
+            --page-height: 297mm;
+        }
+
         body {
-            background-color: #2c3e50;
+            background-color: var(--bg-color);
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: "Times New Roman", Times, serif;
+            font-family: 'Times New Roman', Times, serif;
+            padding-bottom: 100px;
         }
 
-        /* Контейнер для адаптации под экран */
-        .page-container {
-            padding: 20px;
+        .viewport {
+            width: 100%;
             display: flex;
             justify-content: center;
-            width: 100%;
-            box-sizing: border-box;
+            overflow: hidden;
+            padding-top: 20px;
         }
 
-        /* Лист А4 */
-        .a4-page {
+        .slider {
+            position: relative;
+            width: var(--page-width);
+            height: var(--page-height);
+            transform-origin: top center;
+        }
+
+        .page {
+            display: none;
             background: white;
-            width: 210mm;
-            min-height: 297mm;
-            /* Поля по твоей инструкции */
-            padding: 20mm 15mm 20mm 30mm; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Растягивает блоки по высоте */
+            width: var(--page-width);
+            height: var(--page-height);
+            padding: 20mm 15mm 20mm 30mm; /* Поля по ГОСТу: левое 30мм */
             box-sizing: border-box;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            color: black;
+            position: absolute;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
         }
 
+        .active { display: flex; flex-direction: column; }
+
+        /* Текстовое оформление */
         .center { text-align: center; }
         .bold { font-weight: bold; }
+        .justify { text-align: justify; }
+        .indent { text-indent: 1.25cm; }
         
-        .school-name { font-size: 14pt; text-transform: uppercase; }
-        
-        .main-title { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px;
+        h1 { font-size: 18pt; margin-bottom: 20px; text-transform: uppercase; }
+        p { font-size: 14pt; line-height: 1.5; margin: 8px 0; }
+        .page-number { position: absolute; bottom: 15mm; right: 20mm; font-size: 12pt; }
+
+        /* Кнопки */
+        .nav-panel {
+            position: fixed;
+            bottom: 20px;
+            background: #222;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border: 2px solid #007bff;
+            z-index: 1000;
         }
-        .project-label { font-size: 16pt; }
-        .topic-name { font-size: 18pt; line-height: 1.3; }
 
-        .authors-info {
-            align-self: flex-end; /* Сдвиг вправо */
-            text-align: left;
-            width: fit-content;
-            font-size: 14pt;
-            line-height: 1.6;
-            margin-right: 10mm;
+        button {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
         }
 
-        .footer-city { font-size: 14pt; margin-bottom: 5mm; }
+        .page-info { color: white; font-size: 18px; font-weight: bold; }
 
-        /* Масштабирование для мобилок */
-        @media (max-width: 210mm) {
-            .page-container { padding: 5px; }
-            .a4-page {
-                transform: scale(calc(window.innerWidth / 210mm));
-                zoom: 0.45; /* Для телефонов */
-                width: 100%;
-                min-height: auto;
-            }
+        @media (max-width: 215mm) {
+            .slider { transform: scale(0.4); }
+            .nav-panel { width: 95%; justify-content: space-between; }
         }
     </style>
 </head>
 <body>
 
-    <div class="page-container">
-        <div class="a4-page">
-            
-            <div class="school-name bold center">
-                VOSIQ International School
+<div class="viewport">
+    <div class="slider" id="slider">
+        
+        <div class="page active" id="p1">
+            <div class="center bold" style="font-size: 14pt; margin-bottom: 70mm;">VOSIQ INTERNATIONAL SCHOOL</div>
+            <div class="center">
+                <div class="bold" style="font-size: 18pt;">ПРОЕКТНАЯ РАБОТА</div>
+                <div style="font-size: 14pt;">по предмету: Литература</div>
+                <br><br>
+                <div class="bold" style="font-size: 22pt;">Тема: «Алые паруса» А. Грина:<br>как мечта становится реальностью</div>
             </div>
-
-            <div class="main-title center">
-                <div class="project-label bold">ПРОЕКТНАЯ РАБОТА</div>
-                <div style="font-size: 14pt;">по литературе</div>
-                <div class="topic-name bold">
-                    Тема: «Алые паруса» А. Грина:<br>
-                    как мечта становится реальностью
-                </div>
-            </div>
-
-            <div class="authors-info">
+            <div style="margin-top: auto; align-self: flex-end; width: 60%; font-size: 14pt; margin-bottom: 40mm;">
                 <strong>Выполнили:</strong> ученики 8 «Д» класса<br>
                 Абдумумин Абдувахидов,<br>
                 Ахмаджон Сатимов,<br>
@@ -99,14 +114,116 @@
                 <strong>Преподаватель:</strong><br>
                 Людмила Сергеевна
             </div>
-
-            <div class="footer-city center bold">
-                Ташкент<br>
-                2026
-            </div>
-
+            <div class="center bold" style="margin-top: auto;">Ташкент 2026</div>
         </div>
+
+        <div class="page" id="p2">
+            <div class="center bold"><h1>Оглавление</h1></div>
+            <div style="font-size: 16pt; line-height: 2.2; margin-top: 30px;">
+                1. Введение ........................................................................ 3<br>
+                2. Глава 1. История создания и жанр повести ................ 4<br>
+                3. Глава 2. Путь героев к мечте: Ассоль и Грей ............. 5<br>
+                4. Глава 3. Символическое значение алых парусов ...... 6<br>
+                5. Глава 4. Почему мечты становятся реальностью? .... 7<br>
+                6. Заключение ................................................................... 8<br>
+                7. Список использованной литературы ........................... 9
+            </div>
+            <div class="page-number">2</div>
+        </div>
+
+        <div class="page" id="p3">
+            <div class="center bold"><h1>Введение</h1></div>
+            <p class="indent justify"><strong>Актуальность темы.</strong> Повесть Александра Грина «Алые паруса» — это не просто сказка для детей, а глубокое философское произведение. В мире, где материальные ценности часто выходят на первый план, история Ассоль напоминает нам о важности духовности, верности своим идеалам и способности ждать.</p>
+            <p class="indent justify"><strong>Объект исследования.</strong> Литературное наследие А. С. Грина, в частности повесть-феерия «Алые паруса».</p>
+            <p class="indent justify"><strong>Цель проекта.</strong> На основе анализа текста доказать, что мечта может стать реальностью, если она подкреплена сильной верой одного человека и решительным действием другого.</p>
+            <p class="indent justify"><strong>Задачи.</strong> 1) Изучить исторический контекст написания повести. 2) Дать характеристику главным героям. 3) Проанализировать, какими способами Грей превращает мечту в жизнь. 4) Раскрыть смысл финала произведения.</p>
+            <div class="page-number">3</div>
+        </div>
+
+        <div class="page" id="p4">
+            <div class="center bold"><h1>Глава 1. История создания</h1></div>
+            <p class="indent justify">Александр Грин начал писать «Алые паруса» в 1916 году. Первые наброски появились, когда он увидел в витрине магазина игрушечную лодку с белыми парусами. Он подумал: «А если бы паруса были красными?». Так родилась идея. Завершено произведение было в 1922 году, в период послереволюционной разрухи.</p>
+            <p class="indent justify">Жанр феерии выбран автором не случайно. Грин хотел показать, что в жизни всегда есть место чуду. Однако, в отличие от народных сказок, здесь нет волшебной палочки. Автор подчеркивает, что мир Каперны (деревни, где живет Ассоль) жесток и приземлен. Жители этой деревни не верят в сказки, они смеются над Ассоль и её отцом Лонгреном. Это создает конфликт между «высокой мечтой» и «серой реальностью».</p>
+            <div class="page-number">4</div>
+        </div>
+
+        <div class="page" id="p5">
+            <div class="center bold"><h1>Глава 2. Путь Ассоль и Грея</h1></div>
+            <p class="indent justify">Главная героиня, <strong>Ассоль</strong>, с детства живет в изоляции. Её единственная опора — отец и предсказание собирателя сказок Эгля. Её вера в корабль под алыми парусами — это не безумие, а внутренняя сила, которая позволяет ей не ожесточиться в ответ на злобу окружающих.</p>
+            <p class="indent justify"><strong>Артур Грей</strong> — полная противоположность обычным жителям. Он родился в замке, но его душа стремилась к морю. Грей сам «сделал» себя капитаном. Когда он встречает спящую Ассоль в лесу, он не просто влюбляется, он узнает в ней родственную душу. Грей понимает, что чудо не свалится с неба — его нужно организовать. Он покупает две тысячи метров алого шелка, нанимает лучших музыкантов и входит в гавань так, как обещало предсказание. Это поступок сильного человека, который берет ответственность за чужую мечту.</p>
+            <div class="page-number">5</div>
+        </div>
+
+        <div class="page" id="p6">
+            <div class="center bold"><h1>Глава 3. Символика</h1></div>
+            <p class="indent justify">Алые паруса — центральный символ повести. Это символ радости, любви и вызова всему привычному. Красный цвет в литературе часто ассоциируется с кровью, но у Грина — это цвет утренней зари, начала новой жизни.</p>
+            <p class="indent justify">Музыка, сопровождающая появление корабля, также является важным символом. Она рушит тишину застывшей Каперны. Грин показывает, что истинная красота способна победить любую сплетню или ненависть. Корабль «Секрет» под алыми парусами — это воплощенная надежда, которая материализовалась в реальности благодаря воле человека.</p>
+            <div class="page-number">6</div>
+        </div>
+
+        <div class="page" id="p7">
+            <div class="center bold"><h1>Глава 4. Реализация мечты</h1></div>
+            <p class="indent justify">Почему же мечта Ассоль стала реальностью? Анализируя текст, мы видим две причины. Во-первых, Ассоль была «готова» к этой встрече, она сохранила верность себе. Во-вторых, нашелся человек (Грей), который обладал средствами и желанием это реализовать.</p>
+            <p class="indent justify">В этом и заключается главный психологический урок Грина: для того чтобы мечта сбылась, нужно двое. Один должен светиться изнутри, а другой — совершить поступок. Мечта становится реальностью, когда встречается вера и действие. Это и делает произведение актуальным для нас, современных школьников.</p>
+            <div class="page-number">7</div>
+        </div>
+
+        <div class="page" id="p8">
+            <div class="center bold"><h1>Заключение</h1></div>
+            <p class="indent justify">В результате проведенного анализа мы пришли к выводу, что повесть «Алые паруса» — это гимн человеческим возможностям. Мы изучили образы персонажей и поняли, что автор призывает каждого из нас быть «Греем» для своих близких.</p>
+            <p class="indent justify">Мечта становится реальностью не по мановению магии, а по воле человека. Мы выполнили поставленные задачи: раскрыли смысл жанра феерии и доказали, что алые паруса — это символ победы духа. Данная работа помогла нам лучше понять психологию героев и важность доброты в нашей жизни.</p>
+            <div class="page-number">8</div>
+        </div>
+
+        <div class="page" id="p9">
+            <div class="center bold"><h1>Список литературы</h1></div>
+            <div style="font-size: 14pt; margin-top: 50px; line-height: 2;">
+                1. Грин А. С. «Алые паруса». — Ташкент: Янги аср авлоди, 2022.<br>
+                2. Белоусов В. Г. «Александр Грин: Очерк жизни и творчества». — М., 1972.<br>
+                3. Энциклопедия литературных героев. — М.: АСТ, 1999.<br>
+                4. Грин А. С. Собрание сочинений в 6 томах. — М., 1965.<br>
+                5. Литературный анализ повести «Алые паруса» [Электронный ресурс].
+            </div>
+            <div class="page-number">9</div>
+        </div>
+
     </div>
+</div>
+
+<div class="nav-panel">
+    <button onclick="changePage(-1)">← НАЗАД</button>
+    <div class="page-info" id="status">1 / 9</div>
+    <button onclick="changePage(1)">ВПЕРЕД →</button>
+</div>
+
+<script>
+    let current = 1;
+    const total = 9;
+
+    function changePage(step) {
+        current += step;
+        if (current < 1) current = 1;
+        if (current > total) current = total;
+        
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('p' + current).classList.add('active');
+        document.getElementById('status').innerText = `${current} / ${total}`;
+        window.scrollTo(0,0);
+    }
+
+    function adjustScale() {
+        const slider = document.getElementById('slider');
+        const width = window.innerWidth;
+        if (width < 800) {
+            const scale = width / 900; 
+            slider.style.transform = `scale(${scale})`;
+        } else {
+            slider.style.transform = `scale(1)`;
+        }
+    }
+    window.addEventListener('resize', adjustScale);
+    window.addEventListener('load', adjustScale);
+</script>
 
 </body>
 </html>
