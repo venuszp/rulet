@@ -5,115 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Проект: Алые Паруса</title>
     <style>
-        :root {
-            --bg-color: #2c3e50;
-            --page-width: 210mm;
-            --page-height: 297mm;
-        }
-
         body {
-            background-color: var(--bg-color);
+            background-color: #2c3e50;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: 'Times New Roman', Times, serif;
-            padding: 10px;
+            font-family: "Times New Roman", Times, serif;
         }
 
-        /* Контейнер для масштабирования под мобилки */
-        .viewport {
-            width: 100%;
+        /* Контейнер для адаптации под экран */
+        .page-container {
+            padding: 20px;
             display: flex;
             justify-content: center;
-            overflow: hidden;
-        }
-
-        .slider {
-            position: relative;
-            width: var(--page-width);
-            height: var(--page-height);
-            transform-origin: top center;
-            transition: transform 0.3s ease;
-        }
-
-        /* Сами листы А4 */
-        .page {
-            display: none;
-            background: white;
-            width: var(--page-width);
-            height: var(--page-height);
-            padding: 20mm 15mm 20mm 30mm; /* Поля по инструкции */
+            width: 100%;
             box-sizing: border-box;
-            color: black;
-            position: absolute;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        .active { display: flex; flex-direction: column; }
+        /* Лист А4 */
+        .a4-page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            /* Поля по твоей инструкции */
+            padding: 20mm 15mm 20mm 30mm; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Растягивает блоки по высоте */
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
 
-        /* Текстовые стили */
         .center { text-align: center; }
         .bold { font-weight: bold; }
-        .justify { text-align: justify; }
-        .indent { text-indent: 1.25cm; }
         
-        h1 { font-size: 18pt; margin: 40px 0; text-transform: uppercase; }
-        p { font-size: 14pt; line-height: 1.5; margin: 10px 0; }
+        .school-name { font-size: 14pt; text-transform: uppercase; }
+        
+        .main-title { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px;
+        }
+        .project-label { font-size: 16pt; }
+        .topic-name { font-size: 18pt; line-height: 1.3; }
 
-        /* Управление */
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            background: rgba(0,0,0,0.8);
-            padding: 15px 25px;
-            border-radius: 50px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            z-index: 100;
+        .authors-info {
+            align-self: flex-end; /* Сдвиг вправо */
+            text-align: left;
+            width: fit-content;
+            font-size: 14pt;
+            line-height: 1.6;
+            margin-right: 10mm;
         }
 
-        button {
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: none;
-            background: #3498db;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .footer-city { font-size: 14pt; margin-bottom: 5mm; }
 
-        .page-info { color: white; font-size: 14px; }
-
-        /* Адаптация под мобильные (Масштабирование листа) */
-        @media (max-width: 215mm) {
-            .slider {
-                transform: scale(0.45); /* Для телефонов */
-            }
-            body { padding: 0; }
-        }
-        @media (min-width: 216mm) and (max-width: 768px) {
-            .slider {
-                transform: scale(0.7); /* Для планшетов */
+        /* Масштабирование для мобилок */
+        @media (max-width: 210mm) {
+            .page-container { padding: 5px; }
+            .a4-page {
+                transform: scale(calc(window.innerWidth / 210mm));
+                zoom: 0.45; /* Для телефонов */
+                width: 100%;
+                min-height: auto;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="viewport">
-    <div class="slider" id="slider">
-        
-        <div class="page active" id="p1">
-            <div class="center bold" style="font-size: 14pt; margin-bottom: 60mm;">VOSIQ INTERNATIONAL SCHOOL</div>
-            <div class="center">
-                <div class="bold" style="font-size: 18pt;">ПРОЕКТНАЯ РАБОТА</div>
-                <div style="font-size: 14pt;">по литературе</div>
-                <br><br>
-                <div class="bold" style="font-size: 20pt;">Тема: «Алые паруса» А. Грина:<br>как мечта становится реальностью</div>
+    <div class="page-container">
+        <div class="a4-page">
+            
+            <div class="school-name bold center">
+                VOSIQ International School
             </div>
-            <div style="margin-top: auto; align-self: flex-end; width: 60%; font-size: 14pt; margin-bottom: 40mm;">
+
+            <div class="main-title center">
+                <div class="project-label bold">ПРОЕКТНАЯ РАБОТА</div>
+                <div style="font-size: 14pt;">по литературе</div>
+                <div class="topic-name bold">
+                    Тема: «Алые паруса» А. Грина:<br>
+                    как мечта становится реальностью
+                </div>
+            </div>
+
+            <div class="authors-info">
                 <strong>Выполнили:</strong> ученики 8 «Д» класса<br>
                 Абдумумин Абдувахидов,<br>
                 Ахмаджон Сатимов,<br>
@@ -121,76 +99,14 @@
                 <strong>Преподаватель:</strong><br>
                 Людмила Сергеевна
             </div>
-            <div class="center bold" style="margin-top: auto;">Ташкент 2026</div>
-        </div>
 
-        <div class="page" id="p2">
-            <div class="center bold"><h1>Оглавление</h1></div>
-            <div style="font-size: 16pt; line-height: 2.5; margin-top: 50px;">
-                Введение ........................................................................ 3<br>
-                Глава 1. История создания произведения ................ 4<br>
-                Глава 2. Анализ главных героев ................................. 6<br>
-                Заключение ................................................................... 8<br>
-                Список литературы ...................................................... 9
+            <div class="footer-city center bold">
+                Ташкент<br>
+                2026
             </div>
-        </div>
 
-        <div class="page" id="p3">
-            <div class="center bold"><h1>Введение</h1></div>
-            <p class="indent justify"><strong>Актуальность темы:</strong> В современном мире важно сохранять веру в лучшее. Повесть А. Грина учит нас, что каждый человек может стать творцом судьбы.</p>
-            <p class="indent justify"><strong>Цель работы:</strong> Раскрыть идею того, что истинное чудо создается человеческими руками и волей.</p>
-            <p class="indent justify"><strong>Задачи:</strong> Рассмотреть образы Ассоль и Грея, проанализировать ключевые моменты сюжета.</p>
         </div>
-
-        <div class="page" id="p4">
-            <div class="center bold"><h1>Глава 1. История создания</h1></div>
-            <p class="indent justify">Александр Грин начал писать «Алые паруса» в Петрограде в 1920 году. Это было время голода и холода, но автор создал самую теплую сказку в русской литературе.</p>
-            <p class="indent justify">Жанр феерии позволил Грину соединить реальный мир с миром мечты. Алые паруса стали символом, который понятен каждому — это надежда на счастье.</p>
-        </div>
-
-        <div class="page" id="p5">
-            <div class="center bold"><h1>Глава 2. Анализ героев</h1></div>
-            <p class="indent justify">Ассоль — символ терпения и верности своей мечте. Несмотря на насмешки жителей Каперны, она продолжала ждать.</p>
-            <p class="indent justify">Грей — это человек действия. Он не ждал магии, он купил алый шелк и сам сделал мечту Ассоль реальностью. В этом и заключается главный урок книги.</p>
-        </div>
-
     </div>
-</div>
-
-<div class="controls">
-    <button onclick="changePage(-1)">Назад</button>
-    <div class="page-info" id="status">1 / 5</div>
-    <button onclick="changePage(1)">Вперед</button>
-</div>
-
-<script>
-    let current = 1;
-    const total = 5;
-
-    function changePage(step) {
-        current += step;
-        if (current < 1) current = 1;
-        if (current > total) current = total;
-        
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('p' + current).classList.add('active');
-        document.getElementById('status').innerText = `${current} / ${total}`;
-    }
-
-    // Авто-масштабирование при загрузке
-    function adjustScale() {
-        const slider = document.getElementById('slider');
-        const width = window.innerWidth;
-        if (width < 800) {
-            const scale = width / 850; 
-            slider.style.transform = `scale(${scale})`;
-        } else {
-            slider.style.transform = `scale(1)`;
-        }
-    }
-    window.addEventListener('resize', adjustScale);
-    window.addEventListener('load', adjustScale);
-</script>
 
 </body>
 </html>
