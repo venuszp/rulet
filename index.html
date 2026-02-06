@@ -3,77 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAMEN - Проект Алые Паруса</title>
+    <title>Проектная работа: Материальное и духовное</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
         :root { --paper-w: 210mm; --paper-h: 297mm; }
+        
+        /* Экранные стили */
         body { margin: 0; background: #0f0f0f; height: 100vh; overflow: hidden; font-family: "Times New Roman", Times, serif; }
         #viewport { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
         #canvas { transform-origin: center; will-change: transform; }
+
         .a4-page {
             width: var(--paper-w); height: var(--paper-h);
             background: white; box-shadow: 0 0 50px rgba(0,0,0,0.9);
             padding: 20mm 15mm 20mm 30mm; box-sizing: border-box;
-            position: relative; display: none; flex-direction: column; color: #000;
+            position: relative; display: none; flex-direction: column;
+            color: #000; user-select: text; cursor: text;
         }
         .a4-page.active { display: flex; }
-        h1 { text-align: center; font-size: 22pt; margin: 0 0 15mm 0; text-transform: uppercase; }
-        h2 { font-size: 18pt; margin: 5mm 0; border-bottom: 2px solid #000; text-align: center; }
+
+        /* Оформление текста */
+        h1 { text-align: center; font-size: 22pt; margin: 0 0 15mm 0; text-transform: uppercase; line-height: 1.2; }
+        h2 { font-size: 18pt; margin: 5mm 0 5mm 0; border-bottom: 2px solid #000; text-align: center; padding-bottom: 5px; }
+        h3 { font-size: 15pt; margin: 4mm 0; text-align: left; font-weight: bold; line-height: 1.2; }
         p { font-size: 13pt; line-height: 1.5; text-align: justify; margin: 2mm 0; text-indent: 1.25cm; }
+        .no-indent { text-indent: 0; }
         .page-num { position: absolute; bottom: 10mm; right: 15mm; font-size: 11pt; }
+
+        /* Кнопки управления */
         .ui { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 1000; mix-blend-mode: difference; }
-        button { padding: 8px 16px; background: white; border: none; color: black; border-radius: 4px; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 11px; }
+        button { padding: 8px 16px; background: white; border: none; color: black; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 11px; text-transform: uppercase; }
+
+        /* Стили для ПЕЧАТИ и КОПИРОВАНИЯ */
         @media print {
-            body { background: white; overflow: visible; }
-            .ui { display: none; }
-            #viewport, #canvas { display: block; transform: none !important; }
-            .a4-page { display: flex !important; box-shadow: none; page-break-after: always; }
+            @page { size: A4; margin: 0; }
+            body { background: white !important; overflow: visible !important; height: auto !important; }
+            .ui { display: none !important; }
+            #viewport { display: block !important; }
+            #canvas { transform: none !important; display: block !important; }
+            .a4-page { display: flex !important; box-shadow: none !important; margin: 0 !important; page-break-after: always; }
         }
     </style>
 </head>
 <body>
-<div id="viewport"><div id="canvas">
-    <div class="a4-page active">
-        <p style="text-align: center; font-weight: bold; text-indent: 0;">«VOSIQ INTERNATIONAL SCHOOL»</p>
-        <h1 style="margin-top: 60mm;">Проектная работа</h1>
-        <p style="text-align: center; font-weight: bold; font-size: 18pt; text-indent: 0;">«Что важнее: материальные или духовные ценности?»</p>
-        <div style="margin-top: auto; text-align: right; border-top: 1px solid #000;">
-            <p style="text-indent: 0;">Выполнили: Абдувахидов А., Сатимов А., Хакимов А.</p>
-            <p style="text-indent: 0;">Руководитель: Янович Л. С.</p>
+
+<div id="viewport">
+    <div id="canvas">
+        
+        <div class="a4-page active">
+            <p class="no-indent" style="text-align: center; font-weight: bold;">МИНИСТЕРСТВО НАРОДНОГО ОБРАЗОВАНИЯ<br>«VOSIQ INTERNATIONAL SCHOOL»</p>
+            <h1 style="margin-top: 65mm;">Проектная работа</h1>
+            <p class="no-indent" style="text-align: center; font-size: 16pt;">на тему:</p>
+            <p class="no-indent" style="text-align: center; font-weight: bold; font-size: 19pt; margin-top: 5mm;">
+                «Что важнее: материальные или духовные ценности?»
+            </p>
+            <p class="no-indent" style="text-align: center; font-size: 14pt; margin-top: 10mm;">Предмет: Литература</p>
+            <div style="margin-top: auto; text-align: right; border-top: 1px solid #000; padding-top: 10px;">
+                <p class="no-indent"><strong>Выполнили:</strong> ученики 8 «Д» класса</p>
+                <p class="no-indent">Абдувахидов А., Сатимов А., Хакимов А.</p>
+                <p class="no-indent"><strong>Руководитель:</strong> Янович Людмила Сергеевна</p>
+                <p class="no-indent" style="margin-top: 10mm; text-align: center;">Ташкент — 2026</p>
+            </div>
         </div>
+
+        <div class="a4-page">
+            <h2>Введение</h2>
+            <p>В эпоху стремительного технологического прогресса вопрос о соотношении материальных и духовных ценностей становится одной из самых актуальных тем для обсуждения. Мы ежедневно сталкиваемся с выбором: потратить ресурсы на приобретение новых вещей или на внутреннее развитие. Наша работа направлена на то, чтобы исследовать, как меняются эти ориентиры в течение жизни человека и как классическая литература помогает нам найти баланс.</p>
+            <p>Актуальность данного исследования продиктована тем, что современное общество часто называют «обществом потребления». В такой среде легко потерять истинный смысл счастья, подменяя его обладанием предметами. Однако история человечества и великие произведения доказывают, что без духовного фундамента любое благополучие остается хрупким.</p>
+            <p>Целью нашего проекта является изучение того, как мечта и духовность могут влиять на реальность. В качестве примера мы взяли повесть Александра Грина «Алые паруса», где конфликт между приземленным бытом и высокой верой в чудо показан наиболее ярко.</p>
+            <div class="page-num">2</div>
+        </div>
+
+        <div class="a4-page">
+            <h3>1.1. Суть материальных и духовных ценностей</h3>
+            <p>Ценности — это внутренний компас человека. Материальные ценности включают в себя всё осязаемое: деньги, технику, недвижимость. Они обеспечивают наш физический комфорт и безопасность в обществе. Духовные ценности — это наши моральные ориентиры: честность, любовь, знания, дружба и достоинство. В отличие от вещей, духовные ценности нельзя купить или потерять, они являются частью личности человека. Именно они позволяют сохранять человечность в любые времена.</p>
+            <h3>1.2. Механизмы смены жизненных ориентиров</h3>
+            <p>Ценности не являются застывшими. В древности человек зависел от природы, поэтому земля и урожай были высшей ценностью. Сегодня, когда базовые потребности удовлетворены, на первый план выходят вопросы поиска смысла жизни. Личная переоценка часто происходит на этапах взросления: человек начинает понимать, что вещи приносят кратковременную радость, в то время как духовное богатство дает устойчивое ощущение счастья.</p>
+            <div class="page-num">3</div>
+        </div>
+
+        <div class="a4-page">
+            <h3>1.3. Взгляд на мир у молодежи и старших</h3>
+            <p>Для подростков материальные вещи часто становятся способом заявить о себе. Наличие определенного бренда или гаджета помогает чувствовать себя частью группы и повышает уверенность. Это естественный этап поиска своего места в социуме через внешние атрибуты.</p>
+            <p>С другой стороны, люди старшего поколения, учителя и родители, чаще говорят о приоритете духовного. Жизненный опыт учит их тому, что настоящую поддержку в трудную минуту оказывают не вещи, а верность друзей и чистота совести. Старшее поколение склонно дорожить отношениями и знаниями, которые невозможно купить. Наш разбор показывает, что это закономерный процесс развития: от накопления внешнего к осознанию важности внутреннего мира.</p>
+            <div class="page-num">4</div>
+        </div>
+
+        <div class="a4-page">
+            <h3>2.1. Изучение повести «Алые паруса»</h3>
+            <p>Александр Грин создал идеальную иллюстрацию нашей темы. В Каперне, где живет Ассоль, царит мир жесткого материализма. Жители признают только то, что имеет цену в монетах. Они не умеют мечтать и высмеивают любого, кто выделяется из толпы. Их ценности ограничены физическим выживанием.</p>
+            <p>Ассоль и Лонгрен — изгои в этом мире. Их богатство духовное: любовь, умение замечать красоту и непоколебимая вера в мечту. Грэй, родившись в роскоши, чувствует пустоту такой жизни. Он использует свои материальные ресурсы (корабль, алый шелк) не ради наживы, а чтобы воплотить чужую мечту. Он совершает чудо своими руками, доказывая, что материальное должно служить высокой цели. Алые паруса — это символ победы духа над серым бытом.</p>
+            <div class="page-num">5</div>
+        </div>
+
+        <div class="a4-page">
+            <h3>2.2. Итоги практического опроса</h3>
+            <p>Мы опросили 25 учеников и 25 педагогов нашей школы. Результаты среди учеников: 60% (15 чел.) выбрали материальную независимость как главный приоритет на данном этапе. 40% (10 чел.) отметили важность дружбы и творчества.</p>
+            <p>Среди учителей ситуация иная: 72% поставили на первое место здоровье близких, мир и честность. Лишь 28% указали на материальный достаток. Это подтверждает гипотезу о возрастной переоценке ценностей.</p>
+            <h3>Выводы по работе</h3>
+            <p>Материальное и духовное — две стороны жизни. Ошибка жителей Каперны была в отрицании мечты, а сила Грэя — в умении использовать возможности для созидания прекрасного. Мы поняли, что ценности меняются, но важно сохранять веру в чудо. Духовность делает человека личностью, а достаток дает этой личности свободу действий.</p>
+            <div class="page-num">6</div>
+        </div>
+
+        <div class="a4-page">
+            <h2>Заключение</h2>
+            <p>Завершая исследование, мы убедились, что духовные ценности имеют более глубокий характер, чем материальные приобретения. Но пример Артура Грэя учит нас использовать всё, что у нас есть, для исполнения мечты. Повесть «Алые паруса» напоминает: важнее всего то, что наполняет жизнь смыслом. Материальное дает нам опору, а духовное — крылья. Без одного мы не сможем стоять, без другого — не сможем летать.</p>
+            <p>Работа над проектом заставила нас задуматься о собственных приоритетах. Истинное богатство — это свет в душе, которым человек готов делиться с миром.</p>
+            <p style="text-align: center; margin-top: 30mm; font-weight: bold; border-top: 1px solid #000; padding-top: 10px;">КОНЕЦ РАБОТЫ</p>
+            <div class="page-num">7</div>
+        </div>
+
     </div>
-    <div class="a4-page">
-        <h2>Введение</h2>
-        <p>В современном мире выбор между вещами и душой стоит очень остро. Наша работа изучает, почему с возрастом у людей меняются ориентиры. Мы выбрали повесть "Алые паруса", чтобы показать, как мечта побеждает серую реальность.</p>
-        <p>Актуальность темы в том, что в погоне за материальным мы часто теряем человечность. Ассоль и Грэй доказывают, что истинная сила — в верности своей мечте.</p>
-        <div class="page-num">2</div>
-    </div>
-    <div class="a4-page">
-        <h3>Разбор ценностей и «Алых парусов»</h3>
-        <p>Жители Каперны — пример материального мира. Они грубы и не верят в чудеса. Ассоль же живет духовным миром. Грэй, имея деньги, тратит их на алый шелк, соединяя возможности и мечту. Мы провели опрос: 60% учеников ценят вещи, но 72% учителей выбрали духовное. Это доказывает, что опыт меняет нас.</p>
-        <div class="page-num">3</div>
-    </div>
-</div></div>
+</div>
+
 <div class="ui">
     <button id="prevBtn">Назад</button>
-    <button onclick="window.print()">Печать</button>
+    <button onclick="window.print()">ПЕЧАТЬ</button>
     <button id="nextBtn">Далее</button>
 </div>
+
 <script>
-    let current = 1; const pages = document.querySelectorAll('.a4-page');
-    const update = () => { pages.forEach((p, i) => p.style.display = (i+1 === current) ? 'flex' : 'none'); };
+    let current = 1;
+    const pages = document.querySelectorAll('.a4-page');
+    const update = () => {
+        pages.forEach((p, i) => p.style.display = (i+1 === current) ? 'flex' : 'none');
+        document.getElementById('prevBtn').disabled = current === 1;
+        document.getElementById('nextBtn').disabled = current === pages.length;
+    };
     document.getElementById('nextBtn').onclick = () => { if(current < pages.length) {current++; update(); resetTransform();} };
     document.getElementById('prevBtn').onclick = () => { if(current > 1) {current--; update(); resetTransform();} };
-    const canvas = document.getElementById('canvas'); const mc = new Hammer.Manager(document.body);
+    
+    const canvas = document.getElementById('canvas');
+    const mc = new Hammer.Manager(document.body);
     let scale = 1, lastScale = 1, x = 0, y = 0, lastX = 0, lastY = 0;
-    mc.add(new Hammer.Pinch()); mc.add(new Hammer.Pan());
+    mc.add(new Hammer.Pinch()); mc.add(new Hammer.Pan({ threshold: 0 }));
+    
     const apply = () => canvas.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-    const resetTransform = () => { scale = (window.innerHeight * 0.85) / (297 * 3.78); x = 0; y = 0; apply(); };
-    mc.on("pinchmove", (e) => { scale = lastScale * e.scale; apply(); });
+    const resetTransform = () => {
+        scale = (window.innerHeight * 0.88) / (297 * 3.78);
+        lastScale = scale; x = 0; y = 0; lastX = 0; lastY = 0; apply();
+    };
+    mc.on("pinchmove", (e) => { scale = Math.max(0.2, lastScale * e.scale); apply(); });
     mc.on("pinchend", () => lastScale = scale);
     mc.on("panmove", (e) => { x = lastX + e.deltaX; y = lastY + e.deltaY; apply(); });
     mc.on("panend", () => { lastX = x; lastY = y; });
-    resetTransform();
+    
+    window.addEventListener('resize', resetTransform);
+    resetTransform(); update();
 </script>
+
 </body>
 </html>
