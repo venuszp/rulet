@@ -274,4 +274,100 @@
         function addPhoto() {
             const url = document.getElementById('admin-url').value;
             const limit = parseInt(document.getElementById('admin-limit').value);
-            if(!url) return notify
+            if(!url) return notify("Вставьте ссылку на фото", "error");
+            
+            const key = Math.floor(1000 + Math.random() * 9000);
+            db.ref('photos/' + key).set({ url: url, uses: limit }, () => {
+                notify(`Код ${key} создан!`, "success");
+                document.getElementById('admin-url').value = '';
+            });
+        }
+
+        function getPhoto() {
+            const key = document.getElementById('user-key').value;
+            if(!key) return notify("Введите код", "error");
+            
+            db.ref('photos/' + key).once('value').then(snap => {
+                const data = snap.val();
+                if(data && data.uses > 0) {
+                    currentImgUrl = data.url;
+                    document.getElementById('preview-box').style.display = 'block';
+                    document.getElementById('small-preview').src = data.url;
+                    
+                    let newUses = data.uses - 1;
+                    if(newUses <= 0 && data.uses < 900000) {
+                        db.ref('photos/' + key).remove();
+                    } else {
+                        db.ref('photos/' + key).update({ uses: newUses });
+                    }
+                    notify("Доступ разрешен", "success");
+                } else {
+                    notify("Код не найден или истек", "error");
+                }
+            });
+        }
+
+        function openViewer() {
+            const overlay = document.getElementById('viewer-overlay');
+            const img = document.getElementById('viewer-img');
+            img.src = currentImgUrl;
+            overlay.style.display = 'flex';
+            if (pz) pz.destroy();
+            pz = new PinchZoom(img, { minZoom: 1, maxZoom: 6, wheelZoomFactor: 1.1 });
+        }
+
+        function closeViewer(e) {
+            if(e.target.id === 'viewer-overlay' || e.target.id === 'viewer-content') {
+                document.getElementById('viewer-overlay').style.display = 'none';
+            }
+        }
+
+        function loadList() {
+            db.ref('photos').on('value', snap => {
+                const list = document.getElementById('admin-list');
+                list.innerHTML = '';
+                const data = snap.val();
+                if(!data) { list.innerHTML = '<p style="opacity:0.3; text-align:center">База пуста</p>'; return; }
+                
+                for(let key in data) {
+                    let u = data[key].uses > 900000 ? "∞" : data[key].uses;
+                    list.innerHTML += `
+                        <div class="item">
+                            <span>Ключ: <b>${key}</b> (${u})</span>
+                            <div class="item-actions">
+                                <i class="fas fa-eye" onclick="adminPreview('${data[key].url}')"></i>
+                                <i class="fas fa-trash" onclick="confirmDelete('${key}')"></i>
+                            </div>
+                        </div>`;
+                }
+            });
+        }
+
+        function adminPreview(url) {
+            currentImgUrl = url;
+            openViewer();
+        }
+
+        function confirmDelete(key) {
+            deleteKeyPending = key;
+            document.getElementById('confirm-text').innerText = `Код ${key} будет удален навсегда.`;
+            showModal('confirm-modal');
+        }
+
+        document.getElementById('confirm-yes').onclick = function() {
+            if(deleteKeyPending) {
+                db.ref('photos/' + deleteKeyPending).remove();
+                closeModal('confirm-modal');
+                notify("Код удален", "success");
+            }
+        };
+
+        window.onclick = e => { 
+            if (e.target.className === 'modal-overlay') { 
+                closeModal('auth-modal'); 
+                closeModal('confirm-modal'); 
+            } 
+        }
+    </script>
+</body>
+</html>
