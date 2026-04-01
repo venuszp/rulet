@@ -1,4 +1,4 @@
-﻿
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
@@ -325,10 +325,8 @@ window.handleSetup = async () => {
       appeal: null
     };
 
-    const updates = {};
-    updates[`users/${currentAuthUser.uid}`] = profile;
-    updates[`cards/${card}`] = currentAuthUser.uid;
-    await update(ref(db), updates);
+    await update(ref(db, `users/${currentAuthUser.uid}`), profile);
+    await update(ref(db, 'cards'), { [card]: currentAuthUser.uid });
     shouldShowWelcome = true;
   } catch (e) {
     showAlert('Ошибка', e.message, 'error');
@@ -450,11 +448,11 @@ window.handleReissueCard = async () => {
   try {
     const newCard = await generateUniqueCard();
     const oldCard = normalizeCardNumber(currentProfile.card);
-    const updates = {};
-    updates[`users/${currentAuthUser.uid}/card`] = newCard;
-    updates[`cards/${newCard}`] = currentAuthUser.uid;
-    updates[`cards/${oldCard}`] = null;
-    await update(ref(db), updates);
+    await update(ref(db, `users/${currentAuthUser.uid}`), { card: newCard });
+    await update(ref(db, 'cards'), {
+      [newCard]: currentAuthUser.uid,
+      [oldCard]: null
+    });
     showAlert('Готово', 'Карта перевыпущена', 'success');
   } catch (e) {
     showAlert('Ошибка', e.message, 'error');
@@ -668,11 +666,9 @@ window.deleteUser = async (uid) => {
   if (!user || isAdminEmail(user.email)) return;
   if (!confirm('Удалить пользователя безвозвратно?')) return;
 
-  const updates = {};
-  updates[`users/${uid}`] = null;
-  updates[`histories/${uid}`] = null;
-  updates[`cards/${normalizeCardNumber(user.card)}`] = null;
-  await update(ref(db), updates);
+  await update(ref(db, 'users'), { [uid]: null });
+  await update(ref(db, 'histories'), { [uid]: null });
+  await update(ref(db, 'cards'), { [normalizeCardNumber(user.card)]: null });
 };
 
 onAuthStateChanged(auth, (user) => {
